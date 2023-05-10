@@ -3,7 +3,8 @@
 
 <head>
   <title>Merge PDF - Join, Combine PDF files for free online</title>
-  <meta name="description" content="Merge PDF files into one. Free simple tool which combines PDF files online. Just choose PDFs to merge and and with one click get one joined file.">
+  <meta name="description"
+    content="Merge PDF files into one. Free simple tool which combines PDF files online. Just choose PDFs to merge and and with one click get one joined file.">
   <meta name="keywords" content="PDF, Merge, Join, Combine, Online, Free">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -17,13 +18,18 @@
     <button class="btn btn-success mt-3" type="submit" onclick="merge()">Merge pdfs</button>
   </div>
 
-  <script src="https://unpkg.com/pdf-lib@1.4.0" integrity="sha384-YmeCSD7/QxqSjaieqkBiGZwmsOBhVDcrd9yQwI4yzD+W2k/PgQRtEky9KiIWgDJx" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/downloadjs@1.4.7" integrity="sha384-hbJAmMb0syBKVBV1Is9QsvJtOLOgkCnHjDtTRx59YhW/vl48T9wqZH77lv+p48wj" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/pdf-lib@1.4.0"
+    integrity="sha384-YmeCSD7/QxqSjaieqkBiGZwmsOBhVDcrd9yQwI4yzD+W2k/PgQRtEky9KiIWgDJx"
+    crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/downloadjs@1.4.7"
+    integrity="sha384-hbJAmMb0syBKVBV1Is9QsvJtOLOgkCnHjDtTRx59YhW/vl48T9wqZH77lv+p48wj"
+    crossorigin="anonymous"></script>
   <script>
-    merge = async () => await mergePdfs(await Promise.all([...document.getElementById('files').files].map(f => f.arrayBuffer())));
-    async function mergePdfs(pdfsToMerges) {
+    merge = async () => await mergePdfs([...document.getElementById('files').files].sort((a, b) => a.name > b.name ? 1 : -1).map(f => f.arrayBuffer()));
+    async function mergePdfs(files) {
+      const buffers = await Promise.all(files);
       const mergedPdf = await PDFLib.PDFDocument.create();
-      const actions = pdfsToMerges.map(async pdfBuffer => {
+      const actions = buffers.map(async pdfBuffer => {
         const pdf = await PDFLib.PDFDocument.load(pdfBuffer);
         const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
         copiedPages.forEach((page) => mergedPdf.addPage(page));
