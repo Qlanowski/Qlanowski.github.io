@@ -25,16 +25,15 @@
     integrity="sha384-hbJAmMb0syBKVBV1Is9QsvJtOLOgkCnHjDtTRx59YhW/vl48T9wqZH77lv+p48wj"
     crossorigin="anonymous"></script>
   <script>
-    merge = async () => await mergePdfs([...document.getElementById('files').files].sort((a, b) => a.name > b.name ? 1 : -1).map(f => f.arrayBuffer()));
+   merge = async () => await mergePdfs([...document.getElementById('files').files].sort((a, b) => a.name > b.name ? 1 : -1).map(f => ({'name': f.name, 'buffer': f.arrayBuffer()})));
     async function mergePdfs(files) {
-      const buffers = await Promise.all(files);
       const mergedPdf = await PDFLib.PDFDocument.create();
-      const actions = buffers.map(async pdfBuffer => {
-        const pdf = await PDFLib.PDFDocument.load(pdfBuffer);
+      for (let file of files) {
+        const buffer = await file.buffer;
+        const pdf = await PDFLib.PDFDocument.load(buffer);
         const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
         copiedPages.forEach((page) => mergedPdf.addPage(page));
-      });
-      await Promise.all(actions);
+      }
       const pdfBytes = await mergedPdf.save();
       download(pdfBytes, `${document.getElementById('name').value || "merged"}.pdf`, "application/pdf");
     }
